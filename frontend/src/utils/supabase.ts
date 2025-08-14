@@ -21,6 +21,13 @@ export const TABLES = {
   PRODUCTS: 'products',
   CAROUSEL_IMAGES: 'carousel_images',
   ARTICLES: 'articles',
+  USERS: 'users',
+  DEVICES: 'devices',
+  CONSULTATIONS: 'consultations',
+  ORDERS: 'orders',
+  ORDER_ITEMS: 'order_items',
+  HEALTH_RECORDS: 'health_records',
+  REVIEWS: 'reviews',
 } as const
 
 // Supabase错误处理

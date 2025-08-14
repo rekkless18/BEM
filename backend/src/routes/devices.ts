@@ -24,7 +24,7 @@ router.get('/', authenticateToken, async (req, res) => {
       .from('devices')
       .select(`
         *,
-        user:users(id, username, email)
+        user:users(id, nick_name, real_name, phone)
       `);
 
     // 根据用户角色过滤数据
@@ -103,7 +103,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
       .from('devices')
       .select(`
         *,
-        user:users(id, username, email)
+        user:users(id, nick_name, real_name, phone)
       `)
       .eq('id', id)
       .single();
@@ -216,7 +216,7 @@ router.post('/', authenticateToken, async (req, res) => {
       })
       .select(`
         *,
-        user:users(id, username, email)
+        user:users(id, nick_name, real_name, phone)
       `)
       .single();
 

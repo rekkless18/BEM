@@ -30,9 +30,9 @@ import {
   ReloadOutlined
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import { Doctor, Department, ApiResponse } from '../types';
-import { doctorApi, departmentApi } from '../services/api';
-import { useAuthStore } from '../stores/authStore';
+import { Doctor, Department, ApiResponse } from '../../types';
+import { doctorApi, departmentApi } from '../../services/supabaseApi';
+import { useAuthStore } from '../../stores/authStore';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -111,28 +111,20 @@ const DoctorManagement: React.FC = () => {
       
 
       const response = await doctorApi.getList(params);
-      const apiResponse = response.data;
       
-      if (apiResponse.success) {
-        const doctorsData = apiResponse.data;
+      if (response.success) {
+        const doctorsData = response.data || [];
+        setDoctors(doctorsData);
         
-        if (Array.isArray(doctorsData)) {
-          setDoctors(doctorsData);
-          
-          // 更新分页状态
-          setPagination(prev => ({
-            ...prev,
-            current: currentPage,
-            pageSize: currentPageSize,
-            total: apiResponse.pagination?.total || 0
-          }));
-          
-        } else {
-          message.error('数据格式错误');
-          setDoctors([]);
-        }
+        // 更新分页状态
+        setPagination(prev => ({
+          ...prev,
+          current: currentPage,
+          pageSize: currentPageSize,
+          total: response.pagination?.total || 0
+        }));
       } else {
-        message.error(apiResponse.message || '获取医生列表失败');
+        message.error(response.message || '获取医生列表失败');
         setDoctors([]);
       }
     } catch (error) {
@@ -147,9 +139,8 @@ const DoctorManagement: React.FC = () => {
   const fetchDepartments = async () => {
     try {
       const response = await departmentApi.getList();
-      const apiResponse = response.data;
-      if (apiResponse.success) {
-        setDepartments(apiResponse.data);
+      if (response.success) {
+        setDepartments(response.data || []);
       }
     } catch (error) {
       message.error('获取科室列表失败');
@@ -191,15 +182,13 @@ const DoctorManagement: React.FC = () => {
 
       if (editingDoctor) {
         const response = await doctorApi.update(editingDoctor.id, doctorData);
-        const apiResponse = response.data;
-        if (apiResponse.success) {
+        if (response.success) {
           message.success('更新医生信息成功');
           fetchDoctors();
         }
       } else {
         const response = await doctorApi.create(doctorData);
-        const apiResponse = response.data;
-        if (apiResponse.success) {
+        if (response.success) {
           message.success('创建医生成功');
           fetchDoctors();
         }
@@ -216,8 +205,7 @@ const DoctorManagement: React.FC = () => {
   const handleDelete = async (id: string) => {
     try {
       const response = await doctorApi.delete(id);
-      const apiResponse = response.data;
-      if (apiResponse.success) {
+      if (response.success) {
         message.success('删除医生成功');
         fetchDoctors();
       }
@@ -229,9 +217,8 @@ const DoctorManagement: React.FC = () => {
   // 切换医生可用状态
   const toggleAvailability = async (doctor: Doctor) => {
     try {
-      const response = await doctorApi.updateAvailability(doctor.id, !doctor.is_active);
-      const apiResponse = response.data;
-      if (apiResponse.success) {
+      const response = await doctorApi.update(doctor.id, { is_active: !doctor.is_active });
+      if (response.success) {
         // 立即更新本地状态，避免等待重新获取列表
         setDoctors(prevDoctors => 
           prevDoctors.map(d => 
@@ -241,12 +228,7 @@ const DoctorManagement: React.FC = () => {
           )
         );
         
-        // 统计数据已移除
-        
         message.success('更新医生状态成功');
-        
-        // 可选：重新获取列表以确保数据一致性（但不是必需的）
-        // fetchDoctors();
       }
     } catch (error) {
       message.error('更新医生状态失败');

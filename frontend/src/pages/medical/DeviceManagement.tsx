@@ -31,7 +31,7 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
-import { deviceApi } from '../services/api';
+import { deviceApi } from '../../services/api';
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -54,6 +54,10 @@ interface Device {
   hardware_version?: string;
   connection_type: 'bluetooth' | 'wifi' | 'usb' | 'nfc';
   connection_status: 'connected' | 'disconnected' | 'syncing' | 'error';
+  status?: string;
+  location?: string;
+  department?: { name: string; id: string };
+  maintenance_interval?: number;
   sync_frequency: number; // 同步频率（分钟）
   auto_sync: boolean;
   data_retention_days: number;
@@ -61,6 +65,10 @@ interface Device {
   device_settings?: any;
   purchase_date?: string;
   warranty_expiry_date?: string;
+  warranty_expiry?: string;
+  last_maintenance?: string;
+  next_maintenance?: string;
+  specifications?: any;
   manufacturer?: string;
   country_of_origin?: string;
   device_location?: string;
@@ -119,13 +127,15 @@ const DeviceManagement: React.FC = () => {
       const response = await deviceApi.getList(params);
       
       if (response.data.success) {
-         const deviceData = response.data.data;
-         const deviceList = Array.isArray(deviceData) ? deviceData : (deviceData.devices || []);
+         // 正确解析后端返回的设备数据结构 {success: true, data: {devices: [...], pagination: {...}}}
+         const deviceData = response.data.data.devices || [];
+         const deviceList = Array.isArray(deviceData) ? deviceData : [];
          setDevices(deviceList);
+         // 使用后端返回的分页信息而不是前端计算的长度
          setPagination({
-           current: deviceData.pagination?.page || page,
-           pageSize: deviceData.pagination?.limit || pageSize,
-           total: deviceData.pagination?.total || 0
+           current: page,
+           pageSize: pageSize,
+           total: response.data.data.pagination?.total || 0
          });
          
 

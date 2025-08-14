@@ -23,7 +23,6 @@ import {
   Card,
   Row,
   Col,
-  Statistic,
   Tooltip,
   Typography,
   Divider
@@ -44,7 +43,8 @@ import {
 import type { ColumnsType } from 'antd/es/table';
 import type { UploadFile } from 'antd/es/upload/interface';
 import dayjs from 'dayjs';
-import { apiClient } from '../../utils/api';
+import { articleApi } from '../../services/supabaseApi';
+import { uploadFile } from '../../utils/api';
 import {
   Article,
   CreateArticleRequest,
@@ -101,11 +101,11 @@ const ArticleManagement: React.FC = () => {
         ...params
       };
       
-      const response = await apiClient.get<PaginatedResponse<Article>>('/api/community/articles', queryParams);
+      const response = await articleApi.getList(queryParams);
       
       if (response.success) {
-        setArticles(response.data);
-        setTotal(response.total);
+        setArticles((response.data as unknown as Article[]) || []);
+        setTotal(response.total || 0);
       } else {
         message.error(response.message || '获取文章列表失败');
       }
@@ -184,7 +184,7 @@ const ArticleManagement: React.FC = () => {
    */
   const handleDelete = async (id: string) => {
     try {
-      const response = await apiClient.delete(`/api/community/articles/${id}`);
+      const response = await articleApi.delete(id);
       
       if (response.success) {
         message.success('删除成功');
@@ -203,14 +203,12 @@ const ArticleManagement: React.FC = () => {
    */
   const handleBatchDelete = async (ids: string[]) => {
     try {
-      const response = await apiClient.delete('/api/community/articles', { ids });
-      
-      if (response.success) {
-        message.success('批量删除成功');
-        fetchArticles();
-      } else {
-        message.error(response.message || '批量删除失败');
+      // 逐个删除，因为supabaseApi不支持批量删除
+      for (const id of ids) {
+        await articleApi.delete(id);
       }
+      message.success('批量删除成功');
+      fetchArticles();
     } catch (error) {
       console.error('批量删除失败:', error);
       message.error('批量删除失败');
@@ -242,10 +240,10 @@ const ArticleManagement: React.FC = () => {
       let response;
       if (editingItem) {
         // 更新
-        response = await apiClient.put(`/api/community/articles/${editingItem.id}`, formData as UpdateArticleRequest);
+        response = await articleApi.update(editingItem.id, formData as UpdateArticleRequest);
       } else {
         // 新增
-        response = await apiClient.post('/api/community/articles', formData as CreateArticleRequest);
+        response = await articleApi.create(formData as CreateArticleRequest);
       }
       
       if (response.success) {
@@ -270,23 +268,15 @@ const ArticleManagement: React.FC = () => {
     setUploading(true);
     
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('folder', 'articles');
+      const url = await uploadFile(file, 'articles');
       
-      const response = await apiClient.post<UploadResponse>('/api/upload/image', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-      
-      if (response.success && response.url) {
+      if (url) {
         return {
-          url: response.url,
+          url: url,
           status: 'done'
         };
       } else {
-        throw new Error(response.error || '上传失败');
+        throw new Error('上传失败');
       }
     } catch (error) {
       console.error('文件上传失败:', error);
@@ -439,45 +429,7 @@ const ArticleManagement: React.FC = () => {
 
   return (
     <div style={{ padding: '24px' }}>
-      {/* 页面标题和统计 */}
-      <Row gutter={16} style={{ marginBottom: 24 }}>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="总文章数"
-              value={total}
-              prefix={<FileTextOutlined />}
-            />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="已发布"
-              value={articles.filter(item => item.status === 'published').length}
-              valueStyle={{ color: '#3f8600' }}
-            />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="草稿"
-              value={articles.filter(item => item.status === 'draft').length}
-              valueStyle={{ color: '#faad14' }}
-            />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="总浏览量"
-              value={articles.reduce((sum, item) => sum + item.view_count, 0)}
-              prefix={<EyeOutlined />}
-            />
-          </Card>
-        </Col>
-      </Row>
+
 
       {/* 搜索表单 */}
       <Card style={{ marginBottom: 16 }}>
@@ -556,7 +508,7 @@ const ArticleManagement: React.FC = () => {
       {/* 数据表格 */}
       <Table
         columns={columns}
-        dataSource={articles}
+        dataSource={articles || []}
         rowKey="id"
         loading={loading}
         pagination={{
@@ -808,31 +760,14 @@ const ArticleManagement: React.FC = () => {
               <div style={{ marginBottom: 16 }}>
                 <h4>标签</h4>
                 <Space>
-                  {previewItem.tags.split(',').map((tag, index) => (
-                    <Tag key={index}>{tag.trim()}</Tag>
+                  {(Array.isArray(previewItem.tags) ? previewItem.tags : (previewItem.tags ? String(previewItem.tags).split(',') : [])).map((tag, index) => (
+                    <Tag key={index}>{String(tag).trim()}</Tag>
                   ))}
                 </Space>
               </div>
             )}
 
-            {/* 统计信息 */}
-            <div>
-              <h4>统计信息</h4>
-              <Row gutter={16}>
-                <Col span={6}>
-                  <Statistic title="浏览量" value={previewItem.view_count} prefix={<EyeOutlined />} />
-                </Col>
-                <Col span={6}>
-                  <Statistic title="点赞数" value={previewItem.like_count} prefix={<LikeOutlined />} />
-                </Col>
-                <Col span={6}>
-                  <Statistic title="分享数" value={previewItem.share_count} prefix={<ShareAltOutlined />} />
-                </Col>
-                <Col span={6}>
-                  <Statistic title="推荐" value={previewItem.is_featured ? '是' : '否'} />
-                </Col>
-              </Row>
-            </div>
+
           </div>
         )}
       </Modal>

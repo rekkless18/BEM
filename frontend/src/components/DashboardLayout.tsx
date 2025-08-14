@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Layout, Menu, Avatar, Dropdown, Button, Space } from 'antd'
+import type { MenuProps } from 'antd'
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -19,6 +20,8 @@ import {
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
 import type { MenuItem } from '../types'
+
+type MenuItemType = Required<MenuProps>['items'][number]
 
 const { Header, Sider, Content } = Layout
 
@@ -138,6 +141,16 @@ const DashboardLayout: React.FC = () => {
       .filter((item) => !item.children || item.children.length > 0)
   }
 
+  // 转换为 Antd Menu 组件所需的格式
+  const convertToAntdMenuItems = (items: MenuItem[]): MenuItemType[] => {
+    return items.map((item) => ({
+      key: item.key,
+      label: item.label,
+      icon: item.icon,
+      children: item.children && item.children.length > 0 ? convertToAntdMenuItems(item.children) : undefined,
+    }))
+  }
+
   // 处理菜单点击
   const handleMenuClick = ({ key }: { key: string }) => {
     const menuItem = findMenuItem(menuItems, key)
@@ -217,7 +230,7 @@ const DashboardLayout: React.FC = () => {
           mode="inline"
           selectedKeys={getSelectedKeys()}
           defaultOpenKeys={getOpenKeys()}
-          items={filterMenuItems(menuItems)}
+          items={convertToAntdMenuItems(filterMenuItems(menuItems))}
           onClick={handleMenuClick}
         />
       </Sider>

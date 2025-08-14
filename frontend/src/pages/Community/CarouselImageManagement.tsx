@@ -23,7 +23,6 @@ import {
   Card,
   Row,
   Col,
-  Statistic,
   Tooltip
 } from 'antd';
 import {
@@ -39,8 +38,8 @@ import {
 import type { ColumnsType } from 'antd/es/table';
 import type { UploadFile } from 'antd/es/upload/interface';
 import dayjs from 'dayjs';
-import { apiClient } from '../../utils/api';
-import api from '../../utils/api';
+import { carouselApi } from '../../services/supabaseApi';
+import { uploadFile } from '../../utils/api';
 import {
   CarouselImage,
   CreateCarouselImageRequest,
@@ -95,11 +94,11 @@ const CarouselImageManagement: React.FC = () => {
         ...params
       };
       
-      const response = await apiClient.get<PaginatedResponse<CarouselImage>>('/api/carousel-images', queryParams);
+      const response = await carouselApi.getList(queryParams);
       
       if (response.success) {
-        setCarouselImages(response.data);
-        setTotal(response.total);
+        setCarouselImages((response.data as unknown as CarouselImage[]) || []);
+        setTotal(response.total || 0);
       } else {
         message.error(response.message || '获取轮播图列表失败');
       }
@@ -179,7 +178,7 @@ const CarouselImageManagement: React.FC = () => {
    */
   const handleDelete = async (id: string) => {
     try {
-      const response = await apiClient.delete(`/api/carousel-images/${id}`);
+      const response = await carouselApi.delete(id);
       
       if (response.success) {
         message.success('删除成功');
@@ -198,14 +197,12 @@ const CarouselImageManagement: React.FC = () => {
    */
   const handleBatchDelete = async (ids: string[]) => {
     try {
-      const response = await apiClient.delete('/api/carousel-images', { ids });
-      
-      if (response.success) {
-        message.success('批量删除成功');
-        fetchCarouselImages();
-      } else {
-        message.error(response.message || '批量删除失败');
+      // 逐个删除，因为supabaseApi不支持批量删除
+      for (const id of ids) {
+        await carouselApi.delete(id);
       }
+      message.success('批量删除成功');
+      fetchCarouselImages();
     } catch (error) {
       console.error('批量删除失败:', error);
       message.error('批量删除失败');
@@ -238,10 +235,10 @@ const CarouselImageManagement: React.FC = () => {
       let response;
       if (editingItem) {
         // 更新
-        response = await apiClient.put(`/api/carousel-images/${editingItem.id}`, formData as UpdateCarouselImageRequest);
+        response = await carouselApi.update(editingItem.id, formData as UpdateCarouselImageRequest);
       } else {
         // 新增
-        response = await apiClient.post('/api/carousel-images', formData as CreateCarouselImageRequest);
+        response = await carouselApi.create(formData as CreateCarouselImageRequest);
       }
       
       if (response.success) {
@@ -265,24 +262,15 @@ const CarouselImageManagement: React.FC = () => {
   const handleUpload = async (file: File) => {
     setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append('image', file);
-      formData.append('folder', 'carousel-images');
+      const url = await uploadFile(file, 'carousel-images');
       
-      // 使用正确的API路径，包含/api前缀
-      const response = await api.post('/api/upload/image', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-      
-      if (response.success && response.url) {
+      if (url) {
         return {
-          url: response.url,
+          url: url,
           status: 'done'
         };
       } else {
-        throw new Error(response.error || '上传失败');
+        throw new Error('上传失败');
       }
     } catch (error) {
       console.error('文件上传失败:', error);
@@ -415,45 +403,7 @@ const CarouselImageManagement: React.FC = () => {
 
   return (
     <div style={{ padding: '24px' }}>
-      {/* 页面标题和统计 */}
-      <Row gutter={16} style={{ marginBottom: 24 }}>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="总轮播图数"
-              value={total}
-              prefix={<BarChartOutlined />}
-            />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="启用中"
-              value={carouselImages.filter(item => item.is_active).length}
-              valueStyle={{ color: '#3f8600' }}
-            />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="已禁用"
-              value={carouselImages.filter(item => !item.is_active).length}
-              valueStyle={{ color: '#cf1322' }}
-            />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="总点击量"
-              value={carouselImages.reduce((sum, item) => sum + item.click_count, 0)}
-              prefix={<BarChartOutlined />}
-            />
-          </Card>
-        </Col>
-      </Row>
+
 
       {/* 搜索表单 */}
       <Card style={{ marginBottom: 16 }}>
@@ -520,7 +470,7 @@ const CarouselImageManagement: React.FC = () => {
       {/* 数据表格 */}
       <Table
         columns={columns}
-        dataSource={carouselImages}
+        dataSource={carouselImages || []}
         rowKey="id"
         loading={loading}
         pagination={{

@@ -105,6 +105,9 @@ export interface CarouselImageQueryParams extends PaginationParams {
   status?: 'active' | 'inactive' | 'all'; // 状态筛选（可选）
   target_type?: string; // 目标类型筛选（可选）
   search?: string; // 标题搜索关键词（可选）
+  dateRange?: any; // 日期范围筛选（可选）
+  start_date?: string; // 开始日期筛选（可选）
+  end_date?: string; // 结束日期筛选（可选）
 }
 
 // 文章查询参数接口
@@ -114,6 +117,7 @@ export interface ArticleQueryParams extends PaginationParams {
   author?: string; // 作者筛选（可选）
   is_featured?: boolean; // 是否推荐筛选（可选）
   search?: string; // 标题搜索关键词（可选）
+  dateRange?: any; // 日期范围筛选（可选）
   start_date?: string; // 开始日期筛选（可选）
   end_date?: string; // 结束日期筛选（可选）
 }

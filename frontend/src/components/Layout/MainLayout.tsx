@@ -18,7 +18,6 @@ import {
   UserOutlined,
   MedicineBoxOutlined,
   ShoppingCartOutlined,
-  BulbOutlined,
   SettingOutlined,
   LogoutOutlined,
   BellOutlined,
@@ -92,12 +91,11 @@ const MainLayout: React.FC = () => {
    * 根据用户角色显示不同的菜单项
    */
   const getMenuItems = (): MenuProps['items'] => {
-    const baseItems = [
+    const baseItems: any[] = [
       {
         key: '/dashboard',
         icon: <DashboardOutlined />,
         label: '仪表板',
-        onClick: () => navigate('/dashboard'),
       },
     ];
 
@@ -111,7 +109,6 @@ const MainLayout: React.FC = () => {
           {
             key: '/users',
             label: '用户列表',
-            onClick: () => navigate('/users'),
           },
         ],
       });
@@ -127,17 +124,14 @@ const MainLayout: React.FC = () => {
           {
             key: '/doctors',
             label: '医生管理',
-            onClick: () => navigate('/doctors'),
           },
           {
             key: '/departments',
             label: '科室管理',
-            onClick: () => navigate('/departments'),
           },
           {
             key: '/devices',
             label: '设备管理',
-            onClick: () => navigate('/devices'),
           },
         ],
       });
@@ -153,47 +147,12 @@ const MainLayout: React.FC = () => {
           {
             key: '/products',
             label: '商品管理',
-            onClick: () => navigate('/products'),
-          },
-          {
-            key: '/orders',
-            label: '订单管理',
-            onClick: () => navigate('/orders'),
-          },
-          {
-            key: '/categories',
-            label: '分类管理',
-            onClick: () => navigate('/categories'),
           },
         ],
       });
     }
 
-    // 营销管理 - 营销管理员和超级管理员
-    if (hasAnyRole(['marketing_admin', 'super_admin'])) {
-      baseItems.push({
-        key: 'marketing',
-        icon: <BulbOutlined />,
-        label: '营销管理',
-        children: [
-          {
-            key: '/promotions',
-            label: '促销活动',
-            onClick: () => navigate('/promotions'),
-          },
-          {
-            key: '/coupons',
-            label: '优惠券',
-            onClick: () => navigate('/coupons'),
-          },
-          {
-            key: '/analytics',
-            label: '数据分析',
-            onClick: () => navigate('/analytics'),
-          },
-        ],
-      });
-    }
+
 
     // 社区管理 - 营销管理员和超级管理员
     if (hasAnyRole(['marketing_admin', 'super_admin'])) {
@@ -205,12 +164,10 @@ const MainLayout: React.FC = () => {
           {
             key: '/community/carousel-images',
             label: '轮播图管理',
-            onClick: () => navigate('/community/carousel-images'),
           },
           {
             key: '/community/articles',
             label: '文章管理',
-            onClick: () => navigate('/community/articles'),
           },
         ],
       });
@@ -226,23 +183,27 @@ const MainLayout: React.FC = () => {
           {
             key: '/admin-users',
             label: '管理员管理',
-            onClick: () => navigate('/admin-users'),
           },
           {
             key: '/system-settings',
             label: '系统设置',
-            onClick: () => navigate('/system-settings'),
           },
           {
             key: '/logs',
             label: '系统日志',
-            onClick: () => navigate('/logs'),
           },
         ],
       });
     }
 
     return baseItems;
+  };
+
+  /**
+   * 处理菜单点击事件
+   */
+  const handleMenuClick = ({ key }: { key: string }) => {
+    navigate(key);
   };
 
   /**
@@ -265,14 +226,10 @@ const MainLayout: React.FC = () => {
         pathname.startsWith('/devices')) {
       openKeys.push('medical');
     }
-    if (pathname.startsWith('/products') || pathname.startsWith('/orders') || 
-        pathname.startsWith('/categories')) {
+    if (pathname.startsWith('/products')) {
       openKeys.push('mall');
     }
-    if (pathname.startsWith('/promotions') || pathname.startsWith('/coupons') || 
-        pathname.startsWith('/analytics')) {
-      openKeys.push('marketing');
-    }
+
     if (pathname.startsWith('/community')) {
       openKeys.push('community');
     }
@@ -304,17 +261,15 @@ const MainLayout: React.FC = () => {
       users: '用户管理',
       doctors: '医生管理',
       departments: '科室管理',
-
       devices: '设备管理',
       products: '商品管理',
-      orders: '订单管理',
-      categories: '分类管理',
+      carousel: '轮播图管理',
+      articles: '文章管理',
       promotions: '促销活动',
       coupons: '优惠券',
       analytics: '数据分析',
       community: '社区管理',
       'carousel-images': '轮播图管理',
-      articles: '文章管理',
       'admin-users': '管理员管理',
       'system-settings': '系统设置',
       logs: '系统日志',
@@ -375,6 +330,7 @@ const MainLayout: React.FC = () => {
           selectedKeys={getSelectedKeys()}
           defaultOpenKeys={getOpenKeys()}
           items={getMenuItems()}
+          onClick={handleMenuClick}
           style={{ borderRight: 0 }}
         />
       </Sider>
@@ -423,7 +379,7 @@ const MainLayout: React.FC = () => {
                 />
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                   <Text style={{ fontSize: '14px', fontWeight: 500 }}>
-                    {user?.name || user?.username}
+                    {user?.name || user?.username || '未知用户'}
                   </Text>
                   <Text type="secondary" style={{ fontSize: '12px' }}>
                     {user?.role === 'super_admin' ? '超级管理员' :

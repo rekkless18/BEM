@@ -82,19 +82,18 @@ export interface Article {
   title: string
   content: string
   summary?: string
-  coverImage?: string
-  authorId: string
-  authorName?: string
-  categoryId?: string
-  categoryName?: string
+  cover_image?: string
+  author?: string
+  category?: string
   tags: string[]
-  viewCount: number
-  isPublished: boolean
-  publishedAt?: string
-  status?: string
-  is_featured?: boolean
-  createdAt: string
-  updatedAt: string
+  view_count: number
+  like_count: number
+  share_count: number
+  status: 'draft' | 'published' | 'archived'
+  is_featured: boolean
+  published_at?: string
+  created_at: string
+  updated_at: string
 }
 
 // API响应接口

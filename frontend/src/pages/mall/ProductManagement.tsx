@@ -6,7 +6,6 @@ import {
   Form,
   Input,
   Select,
-  Switch,
   Space,
   message,
   Popconfirm,
@@ -14,27 +13,23 @@ import {
   Card,
   Row,
   Col,
-  Statistic,
   Image,
   InputNumber,
   DatePicker,
   Divider,
-  Alert,
   Badge
 } from 'antd';
 import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
-  ShoppingOutlined,
-  WarningOutlined,
-  DollarOutlined,
   InboxOutlined,
   EyeOutlined
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import { Product, ApiResponse } from '../types';
-import { productApi } from '../services/api';
+import { Product } from '../../types';
+import { productApi } from '../../services/supabaseApi';
+import { uploadFile } from '../../utils/api';
 import dayjs from 'dayjs';
 
 const { Option } = Select;
@@ -45,7 +40,7 @@ interface ProductFormData {
   description?: string;
   price: number;
   original_price?: number;
-  category: number;
+  category: string;
   category_name?: string;
   brand?: string;
   model?: string;
@@ -77,21 +72,17 @@ const ProductManagement: React.FC = () => {
   const [searchText, setSearchText] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedStatus, setSelectedStatus] = useState<string>('');
-  const [lowStockProducts, setLowStockProducts] = useState<Product[]>([]);
-  const [stats, setStats] = useState({
-    total: 0,
-    active: 0,
-    lowStock: 0,
-    totalValue: 0
-  });
+  // 移除统计相关状态
+  // const [lowStockProducts, setLowStockProducts] = useState<Product[]>([]);
+  // const [stats, setStats] = useState({ total: 0, active: 0, lowStock: 0, totalValue: 0 });
 
   // 商品分类选项
   const categoryOptions = [
-    { value: 1, label: '医疗器械' },
-    { value: 2, label: '保健品' },
-    { value: 3, label: '药品' },
-    { value: 4, label: '医疗耗材' },
-    { value: 5, label: '康复用品' }
+    { value: '1', label: '医疗器械' },
+    { value: '2', label: '保健品' },
+    { value: '3', label: '药品' },
+    { value: '4', label: '医疗耗材' },
+    { value: '5', label: '康复用品' }
   ];
 
   // 商品状态选项
@@ -113,17 +104,9 @@ const ProductManagement: React.FC = () => {
       
       const response = await productApi.getList(params);
       if (response.success) {
-        setProducts(response.data);
-        // 更新统计数据
-        const totalValue = response.data.reduce((sum, product) => 
-          sum + (product.price * product.stock_quantity), 0
-        );
-        setStats({
-          total: response.data.length,
-          active: response.data.filter(p => p.status === 'active').length,
-          lowStock: response.data.filter(p => p.stock_quantity <= p.min_stock_level).length,
-          totalValue
-        });
+        const products = response.data as Product[];
+        setProducts(products);
+        // 移除统计数据更新逻辑
       }
     } catch (error) {
       message.error('获取商品列表失败');
@@ -132,21 +115,12 @@ const ProductManagement: React.FC = () => {
     }
   };
 
-  // 获取库存预警商品
-  const fetchLowStockProducts = async () => {
-    try {
-      const response = await productApi.getLowStock();
-      if (response.success) {
-        setLowStockProducts(response.data);
-      }
-    } catch (error) {
-      console.error('获取库存预警失败:', error);
-    }
-  };
+  // 移除库存预警商品获取函数
+  // const fetchLowStockProducts = async () => { ... };
 
   useEffect(() => {
     fetchProducts();
-    fetchLowStockProducts();
+    // 移除库存预警数据获取
   }, [searchText, selectedCategory, selectedStatus]);
 
   // 处理新增/编辑商品
@@ -187,11 +161,11 @@ const ProductManagement: React.FC = () => {
     if (!stockProduct) return;
     
     try {
-      const response = await productApi.updateStock(stockProduct.id, values.stock_quantity);
+      const response = await productApi.update(stockProduct.id, { stock_quantity: values.stock_quantity });
       if (response.success) {
         message.success('更新库存成功');
         fetchProducts();
-        fetchLowStockProducts();
+        // 移除库存预警数据刷新
         setStockModalVisible(false);
         stockForm.resetFields();
         setStockProduct(null);
@@ -392,70 +366,9 @@ const ProductManagement: React.FC = () => {
 
   return (
     <div style={{ padding: '24px' }}>
-      {/* 库存预警 */}
-      {lowStockProducts.length > 0 && (
-        <Alert
-          message={`库存预警：${lowStockProducts.length} 个商品库存不足`}
-          description={
-            <div>
-              {lowStockProducts.slice(0, 3).map(product => (
-                <span key={product.id} style={{ marginRight: 16 }}>
-                  {product.name}（剩余：{product.stock_quantity}）
-                </span>
-              ))}
-              {lowStockProducts.length > 3 && '...'}
-            </div>
-          }
-          type="warning"
-          showIcon
-          style={{ marginBottom: 16 }}
-        />
-      )}
+      {/* 移除库存预警Alert组件 */}
 
-      {/* 统计卡片 */}
-      <Row gutter={16} style={{ marginBottom: 24 }}>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="商品总数"
-              value={stats.total}
-              prefix={<ShoppingOutlined />}
-              valueStyle={{ color: '#1890ff' }}
-            />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="在售商品"
-              value={stats.active}
-              prefix={<ShoppingOutlined />}
-              valueStyle={{ color: '#52c41a' }}
-            />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="库存预警"
-              value={stats.lowStock}
-              prefix={<WarningOutlined />}
-              valueStyle={{ color: '#f50' }}
-            />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="库存价值"
-              value={stats.totalValue}
-              prefix={<DollarOutlined />}
-              precision={2}
-              valueStyle={{ color: '#722ed1' }}
-            />
-          </Card>
-        </Col>
-      </Row>
+      {/* 移除统计卡片组件 */}
 
       {/* 操作栏 */}
       <Card style={{ marginBottom: 16 }}>

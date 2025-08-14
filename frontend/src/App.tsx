@@ -5,21 +5,19 @@ import zhCN from 'antd/locale/zh_CN';
 import { useAuthStore } from './stores/authStore';
 import ProtectedRoute from './components/ProtectedRoute';
 import MainLayout from './components/Layout/MainLayout';
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import DoctorManagement from './pages/DoctorManagement';
-import DepartmentManagement from './pages/DepartmentManagement';
-import ProductManagement from './pages/ProductManagement';
-import CarouselManagement from './pages/CarouselManagement';
-import ArticleManagement from './pages/ArticleManagement';
+import Login from './pages/auth/Login';
+import Dashboard from './pages/system/Dashboard';
+import DoctorManagement from './pages/medical/DoctorManagement';
+import DepartmentManagement from './pages/medical/DepartmentManagement';
+import ProductManagement from './pages/mall/ProductManagement';
+
 import CommunityCarouselManagement from './pages/Community/CarouselImageManagement';
 import CommunityArticleManagement from './pages/Community/ArticleManagement';
-import AdminManagement from './pages/AdminManagement';
-import UserManagement from './pages/UserManagement';
-import ConsultationManagement from './pages/ConsultationManagement';
-import OrderManagement from './pages/OrderManagement';
-import HealthRecordManagement from './pages/HealthRecordManagement';
-import DeviceManagement from './pages/DeviceManagement';
+import AdminManagement from './pages/system/AdminManagement';
+import UserManagement from './pages/user/UserManagement';
+import SystemSettings from './pages/system/SystemSettings';
+import SystemLogs from './pages/system/SystemLogs';
+import DeviceManagement from './pages/medical/DeviceManagement';
 import 'dayjs/locale/zh-cn';
 import dayjs from 'dayjs';
 
@@ -105,21 +103,11 @@ const App: React.FC = () => {
               {/* 医疗服务管理 */}
               <Route path="doctors" element={<DoctorManagement />} />
               <Route path="departments" element={<DepartmentManagement />} />
-              <Route path="consultations" element={<ConsultationManagement />} />
-              <Route path="health-records" element={<HealthRecordManagement />} />
+
               <Route path="devices" element={<DeviceManagement />} />
               
               {/* 商城管理 */}
               <Route path="products" element={<ProductManagement />} />
-              <Route path="orders" element={<OrderManagement />} />
-              <Route path="categories" element={<div style={{ padding: '24px' }}>分类管理页面开发中...</div>} />
-              
-              {/* 营销管理 */}
-              <Route path="carousel" element={<CarouselManagement />} />
-              <Route path="articles" element={<ArticleManagement />} />
-              <Route path="promotions" element={<div style={{ padding: '24px' }}>促销活动页面开发中...</div>} />
-              <Route path="coupons" element={<div style={{ padding: '24px' }}>优惠券页面开发中...</div>} />
-              <Route path="analytics" element={<div style={{ padding: '24px' }}>数据分析页面开发中...</div>} />
               
               {/* 社区管理 */}
               <Route path="community/carousel-images" element={<CommunityCarouselManagement />} />
@@ -127,8 +115,8 @@ const App: React.FC = () => {
               
               {/* 系统管理 */}
               <Route path="admin-users" element={<AdminManagement />} />
-              <Route path="system-settings" element={<div style={{ padding: '24px' }}>系统设置页面开发中...</div>} />
-              <Route path="logs" element={<div style={{ padding: '24px' }}>系统日志页面开发中...</div>} />
+              <Route path="system-settings" element={<SystemSettings />} />
+              <Route path="logs" element={<SystemLogs />} />
               
               {/* 个人中心 */}
               <Route path="profile" element={<div style={{ padding: '24px' }}>个人资料页面开发中...</div>} />

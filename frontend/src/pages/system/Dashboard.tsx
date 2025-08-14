@@ -13,6 +13,7 @@ import {
   Typography,
   Divider
 } from 'antd';
+import { supabase } from '../../utils/supabase'
 import {
   UserOutlined,
   ShoppingCartOutlined,
@@ -21,7 +22,7 @@ import {
   RiseOutlined,
   EyeOutlined
 } from '@ant-design/icons';
-import { useAuthStore } from '../stores/authStore';
+import { useAuthStore } from '../../stores/authStore';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 

@@ -1,17 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-
-// 用户信息接口
-interface User {
-  id: string; // 用户ID
-  username: string; // 用户名
-  email: string; // 邮箱
-  name: string; // 姓名
-  role: string; // 角色
-  is_active: boolean; // 是否激活
-  last_login_at?: string; // 最后登录时间
-  created_at: string; // 创建时间
-}
+import type { User } from '../types';
 
 // 认证状态接口
 interface AuthState {
@@ -28,6 +17,7 @@ interface AuthActions {
   updateUser: (user: Partial<User>) => void; // 更新用户信息
   setLoading: (loading: boolean) => void; // 设置加载状态
   checkAuth: () => Promise<boolean>; // 检查认证状态
+  hasPermission: (permission: string) => boolean; // 检查权限
 }
 
 // 认证store类型
@@ -99,6 +89,43 @@ export const useAuthStore = create<AuthStore>()(
        */
       setLoading: (loading: boolean) => {
         set({ isLoading: loading });
+      },
+
+      /**
+       * 检查用户权限
+       * @param permission - 权限名称
+       * @returns boolean - 是否有权限
+       */
+      hasPermission: (permission: string): boolean => {
+        const { user } = get();
+        if (!user) return false;
+        
+        // 超级管理员拥有所有权限
+        if (user.role === 'super_admin') return true;
+        
+        // 管理员拥有大部分权限
+        if (user.role === 'admin') {
+          const adminPermissions = [
+            'user.read', 'user.create', 'user.update', 'user.delete',
+            'doctor.read', 'doctor.create', 'doctor.update', 'doctor.delete',
+            'department.read', 'department.create', 'department.update', 'department.delete',
+            'consultation.read', 'consultation.create', 'consultation.update', 'consultation.delete',
+            'device.read', 'device.create', 'device.update', 'device.delete',
+            'article.read', 'article.create', 'article.update', 'article.delete'
+          ];
+          return adminPermissions.includes(permission);
+        }
+        
+        // 普通用户权限
+        if (user.role === 'user') {
+          const userPermissions = [
+            'user.read', 'consultation.read', 'consultation.create',
+            'device.read', 'article.read'
+          ];
+          return userPermissions.includes(permission);
+        }
+        
+        return false;
       },
 
       /**

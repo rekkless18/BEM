@@ -28,8 +28,8 @@ import {
   EnvironmentOutlined
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import { Department, Doctor, ApiResponse } from '../types';
-import { departmentApi, doctorApi } from '../services/api';
+import { Department, Doctor, ApiResponse } from '../../types';
+import { departmentApi, doctorApi } from '../../services/supabaseApi';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -96,10 +96,9 @@ const DepartmentManagement: React.FC = () => {
       const response = await departmentApi.getList(params);
       console.log('📡 科室API响应:', response);
       
-      const apiResponse = response.data;
-      if (apiResponse.success) {
-        console.log('✅ 科室API成功，数据:', apiResponse.data);
-        const departmentsData = apiResponse.data;
+      if (response.success) {
+        console.log('✅ 科室API成功，数据:', response.data);
+        const departmentsData = response.data || [];
         
         setDepartments(departmentsData);
         
@@ -107,15 +106,13 @@ const DepartmentManagement: React.FC = () => {
         setPagination({
           current: currentPage,
           pageSize: currentPageSize,
-          total: apiResponse.pagination?.total || departmentsData.length
+          total: response.pagination?.total || departmentsData.length
         });
         
         console.log(`🏥 获取科室列表成功，状态筛选: ${statusFilter}, 数量: ${departmentsData.length}`);
-        
-
       } else {
-        console.error('❌ 科室API请求失败:', apiResponse.message);
-        message.error(apiResponse.message || '获取科室列表失败');
+        console.error('❌ 科室API请求失败:', response.message);
+        message.error(response.message || '获取科室列表失败');
       }
     } catch (error) {
       console.error('💥 科室请求异常:', error);
@@ -138,14 +135,13 @@ const DepartmentManagement: React.FC = () => {
       
       console.log('🔍 获取在职医生列表，参数:', params);
       const response = await doctorApi.getList(params);
-      const apiResponse = response.data;
       
-      if (apiResponse.success) {
-        const activeDoctors = apiResponse.data || [];
+      if (response.success) {
+        const activeDoctors = response.data || [];
         setDoctors(activeDoctors);
         console.log(`👨‍⚕️ 获取在职医生成功，数量: ${activeDoctors.length}`);
       } else {
-        console.error('❌ 获取在职医生失败:', apiResponse.message);
+        console.error('❌ 获取在职医生失败:', response.message);
         message.error('获取在职医生列表失败');
       }
     } catch (error) {
@@ -174,15 +170,13 @@ const DepartmentManagement: React.FC = () => {
 
       if (editingDepartment) {
         const response = await departmentApi.update(editingDepartment.id, departmentData);
-        const apiResponse = response.data;
-        if (apiResponse.success) {
+        if (response.success) {
           message.success('更新科室信息成功');
           fetchDepartments();
         }
       } else {
         const response = await departmentApi.create(departmentData);
-        const apiResponse = response.data;
-        if (apiResponse.success) {
+        if (response.success) {
           message.success('创建科室成功');
           fetchDepartments();
         }
@@ -199,8 +193,7 @@ const DepartmentManagement: React.FC = () => {
   const handleDelete = async (id: string) => {
     try {
       const response = await departmentApi.delete(id);
-      const apiResponse = response.data;
-      if (apiResponse.success) {
+      if (response.success) {
         message.success('删除科室成功');
         fetchDepartments();
       }
@@ -213,8 +206,7 @@ const DepartmentManagement: React.FC = () => {
   const toggleStatus = async (id: string, is_active: boolean) => {
     try {
       const response = await departmentApi.update(id, { is_active });
-      const apiResponse = response.data;
-      if (apiResponse.success) {
+      if (response.success) {
         message.success(`${is_active ? '启用' : '禁用'}科室成功`);
         fetchDepartments();
       }

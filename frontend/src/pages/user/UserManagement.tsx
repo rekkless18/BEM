@@ -26,28 +26,13 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
-import { userApi } from '../services/api';
+import { userApi } from '../../services/api';
+import type { User } from '../../types';
 
 const { Option } = Select;
 // const { RangePicker } = DatePicker; // 暂时注释掉未使用的导入
 
-/**
- * 用户数据接口
- */
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  name: string;
-  phone?: string;
-  role: 'user' | 'admin' | 'doctor';
-  is_active: boolean;
-  avatar_url?: string;
-  last_login_at?: string;
-  created_at: string;
-  updated_at: string;
-  system_type?: string; // 所属系统字段
-}
+// User接口已从types文件导入
 
 /**
  * 用户管理页面组件
@@ -82,7 +67,6 @@ const UserManagement: React.FC = () => {
       
       if (searchText) params.search = searchText;
       if (statusFilter !== 'all') {
-        // 将前端的'active'/'inactive'转换为后端期望的布尔值
         params.is_active = statusFilter === 'active';
       }
       if (systemFilter !== 'all') params.system_type = systemFilter;
@@ -90,18 +74,15 @@ const UserManagement: React.FC = () => {
       const response = await userApi.getList(params);
       
       if (response.data.success) {
-        // 后端返回的数据结构是 {data: {users: [...], pagination: {...}}}
-        const userData = response.data.data;
-        const userList = Array.isArray(userData) ? userData : (userData.users || []);
-        
-        setUsers(userList);
+        // 后端返回的数据结构是 {success, data: {users, pagination}}
+        const responseData = response.data.data as any;
+        const { users, pagination: paginationData } = responseData;
+        setUsers(users || []);
         setPagination({
-          current: userData.pagination?.page || page,
-          pageSize: userData.pagination?.limit || pageSize,
-          total: userData.pagination?.total || userList.length
+          current: paginationData?.page || page,
+          pageSize: paginationData?.limit || pageSize,
+          total: paginationData?.total || 0
         });
-        
-        // 统计数据已移除
       } else {
         message.error(response.data.message || '获取用户列表失败');
       }
@@ -168,7 +149,6 @@ const UserManagement: React.FC = () => {
   const toggleUserStatus = async (user: User) => {
     try {
       const response = await userApi.update(user.id, {
-        ...user,
         is_active: !user.is_active
       });
 

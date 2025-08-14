@@ -1,6 +1,5 @@
 # Docker Compose配置文件
 # 用于统一管理BEM项目的前后端服务
-version: '3.8'
 
 services:
   # 后端服务

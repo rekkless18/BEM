@@ -24,7 +24,7 @@ RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nodejs -u 1001
 
 # 更改文件所有权
-CHOWN nodejs:nodejs /app
+RUN chown -R nodejs:nodejs /app
 USER nodejs
 
 # 暴露端口

@@ -85,8 +85,8 @@ Dockerfile
 .dockerignore
 docker-compose*.yml
 
-# TypeScript配置（开发时需要，但运行时不需要）
-tsconfig.json
+# TypeScript配置（构建时需要）
+# tsconfig.json
 
 # Supabase相关（迁移文件在容器中不需要）
 supabase

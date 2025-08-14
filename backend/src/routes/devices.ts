@@ -28,8 +28,8 @@ router.get('/', authenticateToken, async (req, res) => {
       `);
 
     // 根据用户角色过滤数据
-    if (req.user.role === 'user') {
-      query = query.eq('user_id', req.user.id);
+    if (req.user?.role === 'user') {
+      query = query.eq('user_id', req.user.userId);
     }
 
     // 搜索条件
@@ -163,7 +163,7 @@ router.post('/', authenticateToken, async (req, res) => {
     } = req.body;
 
     // 验证必填字段
-    if (!device_name || !device_type || !req.user?.id) {
+    if (!device_name || !device_type || !req.user?.userId) {
       return res.status(400).json({
         success: false,
         message: '请填写所有必填字段'
@@ -188,7 +188,7 @@ router.post('/', authenticateToken, async (req, res) => {
     const { data: device, error } = await supabase
       .from('devices')
       .insert({
-        user_id: req.user.id,
+        user_id: req.user.userId,
         device_name,
         device_type,
         brand: brand || null,
@@ -559,8 +559,8 @@ router.get('/maintenance-alerts', authenticateToken, async (req, res) => {
     }
 
     // 分类设备：已过期、即将到期
-    const overdue = [];
-    const upcoming = [];
+    const overdue: any[] = [];
+    const upcoming: any[] = [];
 
     devices?.forEach(device => {
       const nextMaintenance = new Date(device.next_maintenance);

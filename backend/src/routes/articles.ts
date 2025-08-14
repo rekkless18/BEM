@@ -107,6 +107,7 @@ router.get('/', auth, async (req: Request, res: Response) => {
       total: count || 0,
       page: pageNum,
       limit: pageSize,
+      totalPages: Math.ceil((count || 0) / pageSize),
       message: '获取文章列表成功'
     } as PaginatedResponse<Article>);
 
@@ -182,7 +183,7 @@ router.post('/', auth, async (req: Request, res: Response) => {
       category: requestData.category || 'health',
       cover_image: requestData.cover_image || '',
       author: requestData.author,
-      tags: requestData.tags || '',
+      tags: requestData.tags || [],
       status: requestData.status || 'draft',
       is_featured: requestData.is_featured || false,
       view_count: 0,

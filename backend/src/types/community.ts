@@ -112,10 +112,12 @@ export interface ArticleQueryParams extends PaginationParams {
   status?: 'published' | 'draft' | 'archived' | 'all'; // 状态筛选（可选）
   category?: string; // 分类筛选（可选）
   author?: string; // 作者筛选（可选）
-  is_featured?: boolean; // 是否推荐筛选（可选）
+  is_featured?: boolean | string; // 是否推荐筛选（可选，支持布尔值或字符串）
   search?: string; // 标题搜索关键词（可选）
   start_date?: string; // 开始日期筛选（可选）
   end_date?: string; // 结束日期筛选（可选）
+  sort_by?: string; // 排序字段（可选）
+  sort_order?: 'asc' | 'desc'; // 排序方向（可选）
 }
 
 // API响应接口

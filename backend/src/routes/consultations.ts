@@ -31,10 +31,10 @@ router.get('/', authenticateToken, async (req, res) => {
       `);
 
     // 根据用户角色过滤数据
-    if (req.user.role === 'user') {
-      query = query.eq('user_id', req.user.id);
-    } else if (req.user.role === 'doctor') {
-      query = query.eq('doctor_id', req.user.id);
+    if (req.user?.role === 'user') {
+      query = query.eq('user_id', req.user.userId);
+    } else if (req.user?.role === 'doctor') {
+      query = query.eq('doctor_id', req.user.userId);
     }
 
     // 搜索条件

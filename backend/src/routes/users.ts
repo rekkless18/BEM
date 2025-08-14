@@ -43,7 +43,7 @@ router.get('/', authenticateToken, requireAdmin, async (req, res): Promise<any> 
 
     // 状态筛选 - 处理前端传递的is_active参数
     if (is_active !== undefined) {
-      const isActiveValue = is_active === 'true' || is_active === true;
+      const isActiveValue = typeof is_active === 'string' ? is_active === 'true' : Boolean(is_active);
       query = query.eq('is_verified', isActiveValue);
       console.log('📋 添加状态筛选 (is_active):', is_active, '-> is_verified:', isActiveValue);
     } else if (status !== 'all') {

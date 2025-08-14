@@ -279,12 +279,20 @@ router.post('/', authenticateToken, async (req, res) => {
 
     // 更新商品库存
     for (const item of validatedItems) {
-      await supabase
+      // 获取当前库存
+      const { data: productData } = await supabase
         .from('products')
-        .update({
-          stock: supabase.raw(`stock - ${item.quantity}`)
-        })
-        .eq('id', item.product_id);
+        .select('stock')
+        .eq('id', item.product_id)
+        .single();
+      
+      if (productData) {
+        // 更新库存
+        await supabase
+          .from('products')
+          .update({ stock: (productData.stock || 0) - item.quantity })
+          .eq('id', item.product_id);
+      }
     }
 
     // 获取完整的订单信息

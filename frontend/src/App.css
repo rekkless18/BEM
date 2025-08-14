@@ -1,0 +1,164 @@
+/* App组件样式 */
+.App {
+  min-height: 100vh;
+}
+
+/* 登录页面样式 */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.login-form {
+  width: 400px;
+  padding: 40px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.login-title {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #1890ff;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* 仪表板布局样式 */
+.dashboard-layout {
+  min-height: 100vh;
+}
+
+.dashboard-header {
+  background: #fff;
+  padding: 0 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dashboard-logo {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1890ff;
+}
+
+.dashboard-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dashboard-sider {
+  background: #001529;
+}
+
+.dashboard-content {
+  margin: 24px;
+  padding: 24px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  min-height: calc(100vh - 112px);
+}
+
+/* 页面标题样式 */
+.page-header {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #262626;
+  margin: 0;
+}
+
+.page-description {
+  color: #8c8c8c;
+  margin-top: 4px;
+}
+
+/* 表格操作按钮样式 */
+.table-actions {
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.table-actions-left {
+  display: flex;
+  gap: 8px;
+}
+
+.table-actions-right {
+  display: flex;
+  gap: 8px;
+}
+
+/* 状态标签样式 */
+.status-active {
+  color: #52c41a;
+}
+
+.status-inactive {
+  color: #ff4d4f;
+}
+
+.status-online {
+  color: #52c41a;
+}
+
+.status-offline {
+  color: #8c8c8c;
+}
+
+/* 统计卡片样式 */
+.stats-card {
+  text-align: center;
+  padding: 24px;
+}
+
+.stats-number {
+  font-size: 30px;
+  font-weight: 600;
+  color: #1890ff;
+  margin-bottom: 8px;
+}
+
+.stats-label {
+  color: #8c8c8c;
+  font-size: 14px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .dashboard-content {
+    margin: 16px;
+    padding: 16px;
+  }
+  
+  .login-form {
+    width: 90%;
+    margin: 0 20px;
+  }
+  
+  .table-actions {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+  
+  .table-actions-left,
+  .table-actions-right {
+    justify-content: center;
+  }
+}

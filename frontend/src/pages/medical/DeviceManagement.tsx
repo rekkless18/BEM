@@ -128,14 +128,14 @@ const DeviceManagement: React.FC = () => {
       
       if (response.data.success) {
          // 正确解析后端返回的设备数据结构 {success: true, data: {devices: [...], pagination: {...}}}
-         const deviceData = response.data.data.devices || [];
-         const deviceList = Array.isArray(deviceData) ? deviceData : [];
+         const responseData = response.data.data as { devices: Device[]; pagination: { total: number; page: number; limit: number; totalPages: number } };
+         const deviceList = responseData.devices || [];
          setDevices(deviceList);
          // 使用后端返回的分页信息而不是前端计算的长度
          setPagination({
            current: page,
            pageSize: pageSize,
-           total: response.data.data.pagination?.total || 0
+           total: responseData.pagination?.total || 0
          });
          
 

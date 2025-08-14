@@ -369,7 +369,7 @@ export const consultationApi = {
 export const deviceApi = {
   // 获取设备列表
   getList: (params?: PaginationParams) =>
-    api.get<ApiResponse<any[]>>('/devices', { params }),
+    api.get<ApiResponse<{ devices: any[]; pagination: { total: number; page: number; limit: number; totalPages: number } }>>('/devices', { params }),
   
   // 获取设备详情
   getById: (id: string) =>

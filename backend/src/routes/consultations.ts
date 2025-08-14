@@ -31,9 +31,9 @@ router.get('/', authenticateToken, async (req, res) => {
       `);
 
     // 根据用户角色过滤数据
-    if (req.user?.role === 'user') {
+    if (req.user?.role && typeof req.user.role === 'string' && req.user.role.includes('user')) {
       query = query.eq('user_id', req.user.userId);
-    } else if (req.user?.role === 'doctor') {
+    } else if (req.user?.role && typeof req.user.role === 'string' && req.user.role.includes('doctor')) {
       query = query.eq('doctor_id', req.user.userId);
     }
 

@@ -180,20 +180,18 @@ router.post('/', auth, async (req: Request, res: Response) => {
       title: requestData.title,
       content: requestData.content,
       summary: requestData.summary,
-      category: requestData.category || 'health',
-      cover_image: requestData.cover_image || '',
-      author: requestData.author,
+      categoryId: requestData.category || 'health',
+      coverImage: requestData.cover_image || '',
+      authorId: requestData.author,
       tags: requestData.tags || [],
       status: requestData.status || 'draft',
       is_featured: requestData.is_featured || false,
-      view_count: 0,
-      like_count: 0,
-      share_count: 0
+      viewCount: 0
     };
 
     // 如果状态为已发布，设置发布时间
     if (requestData.status === 'published') {
-      insertData.published_at = requestData.published_at || new Date().toISOString();
+      insertData.publishedAt = requestData.published_at || new Date().toISOString();
     }
 
     const { data, error } = await supabase
@@ -242,9 +240,9 @@ router.put('/:id', auth, async (req: Request, res: Response) => {
     if (requestData.title !== undefined) updateData.title = requestData.title;
     if (requestData.content !== undefined) updateData.content = requestData.content;
     if (requestData.summary !== undefined) updateData.summary = requestData.summary;
-    if (requestData.category !== undefined) updateData.category = requestData.category;
-    if (requestData.cover_image !== undefined) updateData.cover_image = requestData.cover_image;
-    if (requestData.author !== undefined) updateData.author = requestData.author;
+    if (requestData.category !== undefined) updateData.categoryId = requestData.category;
+    if (requestData.cover_image !== undefined) updateData.coverImage = requestData.cover_image;
+    if (requestData.author !== undefined) updateData.authorId = requestData.author;
     if (requestData.tags !== undefined) updateData.tags = requestData.tags;
     if (requestData.is_featured !== undefined) updateData.is_featured = requestData.is_featured;
     
@@ -254,9 +252,9 @@ router.put('/:id', auth, async (req: Request, res: Response) => {
       
       // 如果状态改为已发布，设置发布时间
       if (requestData.status === 'published' && !requestData.published_at) {
-        updateData.published_at = new Date().toISOString();
+        updateData.publishedAt = new Date().toISOString();
       } else if (requestData.published_at !== undefined) {
-        updateData.published_at = requestData.published_at;
+        updateData.publishedAt = requestData.published_at;
       }
     }
 

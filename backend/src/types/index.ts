@@ -91,6 +91,8 @@ export interface Article {
   viewCount: number
   isPublished: boolean
   publishedAt?: string
+  status?: string
+  is_featured?: boolean
   createdAt: string
   updatedAt: string
 }

@@ -210,8 +210,7 @@ npm run build
 ## 📞 联系方式
 
 如有问题或建议，请通过以下方式联系：
-- 项目Issues: [GitHub Issues](your-repo-url/issues)
-- 邮箱: your-email@example.com
+- 邮箱: 13147855476@163.com
 
 ## 🙏 致谢
 

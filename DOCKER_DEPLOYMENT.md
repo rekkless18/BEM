@@ -125,6 +125,19 @@ sudo yum install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin d
 # Docker Compose已经通过docker-compose-plugin安装，无需额外安装
 ```
 
+# 卸载已有的Docker仓库配置（如果存在）
+sudo rm -f /etc/yum.repos.d/docker-ce.repo
+
+# 添加阿里云Docker源
+sudo curl -o /etc/yum.repos.d/docker-ce.repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+
+# 清除yum缓存并重新安装
+sudo yum clean all
+sudo yum makecache
+sudo yum install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+
+
 ### 3.3 验证Docker安装
 
 ```bash
@@ -140,6 +153,9 @@ sudo systemctl start docker
 # 设置Docker开机自启
 sudo systemctl enable docker
 ```
+
+
+
 
 **预期结果：** 你应该看到Docker和Docker Compose的版本信息。
 
@@ -179,7 +195,7 @@ cd /home/bem
 
 ```bash
 # 克隆项目（替换为你的实际Git地址）
-sudo git clone https://github.com/rekkless18/BEM.git .
+sudo git clone https://github.com/rekkless18/BEM.git
 
 # 查看文件是否下载成功
 ls -la

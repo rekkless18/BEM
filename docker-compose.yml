@@ -22,7 +22,7 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-24h}
       # 其他配置
-      - ALLOWED_ORIGINS=http://localhost:3000,http://frontend
+      - ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,http://frontend,http://frontend:80,http://bem-frontend,http://bem-frontend:80,http://47.106.198.192,http://47.106.198.192:80,*
     volumes:
       # 挂载日志目录（可选）
       - ./backend/logs:/app/logs
@@ -45,8 +45,8 @@ services:
     ports:
       - "80:80"
     environment:
-      # API基础URL指向后端服务
-      - VITE_API_BASE_URL=http://backend:5000/api
+      # API基础URL指向后端服务 - 生产环境使用公网IP
+      - VITE_API_BASE_URL=http://47.106.198.192:5000/api
     depends_on:
       backend:
         condition: service_healthy

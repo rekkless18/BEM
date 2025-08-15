@@ -6,9 +6,9 @@ const http = require('http');
 
 // 健康检查选项
 const options = {
-  host: 'localhost',
+  host: '127.0.0.1',
   port: process.env.PORT || 5000,
-  path: '/api/health',
+  path: '/health',
   method: 'GET',
   timeout: 2000
 };

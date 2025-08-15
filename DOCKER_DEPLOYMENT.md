@@ -227,7 +227,7 @@ JWT_SECRET=bem-super-secret-jwt-key-2024-production
 JWT_EXPIRES_IN=7d
 
 # CORS配置（允许的前端域名）
-CORS_ORIGIN=http://localhost:3000
+CORS_ORIGIN=*
 
 # 文件上传配置
 MAX_FILE_SIZE=5242880
@@ -237,7 +237,7 @@ UPLOAD_PATH=uploads
 DB_SCHEMA=public
 
 # 允许的源（生产环境时需要修改为实际域名）
-ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,http://frontend,http://frontend:80,http://bem-frontend,http://bem-frontend:80,http://47.106.198.192,http://47.106.198.192:80,*
 ```
 
 ### 5.3 保存文件
@@ -462,7 +462,7 @@ sudo crontab -e
 ```bash
 # 检查Docker容器
 sudo docker-compose ps
-
+sudo docker compose ps
 # 检查Nginx状态
 sudo systemctl status nginx
 

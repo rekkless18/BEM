@@ -40,6 +40,14 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        # 构建时传递环境变量给Dockerfile
+        - VITE_API_BASE_URL=http://47.106.198.192:5000/api
+        - VITE_SUPABASE_URL=https://arazxebdefxtciszqnih.supabase.co
+        - VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFyYXp4ZWJkZWZ4dGNpc3pxbmloIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2Mzg2OTgsImV4cCI6MjA3MDIxNDY5OH0.3CLTpp3VK8bcl_G7Fa_S7Zv5HaY9_Ok9sODJKQLoxZQ
+        - VITE_APP_NAME=BEM医疗管理系统
+        - VITE_APP_VERSION=1.0.0
+        - VITE_DEV_MODE=false
     container_name: bem-frontend
     restart: unless-stopped
     ports:

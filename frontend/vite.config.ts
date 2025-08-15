@@ -13,12 +13,13 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-        secure: false,
-      },
-    },
+    // 移除代理配置，让前端直接使用环境变量中的API地址
+    // proxy: {
+    //   '/api': {
+    //     target: 'http://localhost:5000',
+    //     changeOrigin: true,
+    //     secure: false,
+    //   },
+    // },
   },
 })
